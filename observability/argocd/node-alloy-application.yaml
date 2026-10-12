@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: node-alloy
+  namespace: argocd
+
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: alloy
+      targetRevision: "1.13.1"
+      helm:
+        releaseName: node-alloy
+        skipCrds: true
+        valueFiles:
+          - $values/observability/node-alloy-values.yaml
+
+    - repoURL: https://github.com/prabhat-r-ranjan/ai-code-analyzer.git
+      targetRevision: master
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
