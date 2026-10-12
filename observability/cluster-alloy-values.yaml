@@ -1,0 +1,59 @@
+controller:
+  type: deployment
+  replicas: 1
+
+alloy:
+  clustering:
+    enabled: true
+
+  configMap:
+    create: true
+    content: |
+      discovery.kubernetes "node_alloy" {
+        role = "pod"
+
+        namespaces {
+          names = ["monitoring"]
+        }
+
+        selectors {
+          role  = "pod"
+          label = "app.kubernetes.io/instance=node-alloy"
+        }
+      }
+      discovery.relabel "node_alloy" {
+        targets = discovery.kubernetes.node_alloy.targets
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          regex         = "alloy"
+          action        = "keep"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_port_name"]
+          regex         = "http-metrics"
+          action        = "keep"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_node_name"]
+          target_label  = "instance"
+        }
+      }
+      prometheus.scrape "node_alloy" {
+        targets         = discovery.relabel.node_alloy.output
+        metrics_path    = "/api/v0/component/prometheus.exporter.unix.node/metrics"
+        scrape_interval = "30s"
+        scrape_timeout  = "10s"
+        job_name        = "node-alloy"
+        forward_to      = [prometheus.echo.check.receiver]
+
+        clustering {
+          enabled = true
+        }
+      }
+
+      prometheus.echo "check" {
+        format = "text"
+      }
