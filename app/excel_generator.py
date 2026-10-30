@@ -3,7 +3,7 @@ from io import BytesIO
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
-
+from app.assessment_report_sheets import add_assessment_report_sheets
 
 def create_sheet(wb, name, headers, rows):
     ws = wb.create_sheet(name)
@@ -184,7 +184,8 @@ def generate_excel(analysis):
         ["Assessment Item", "Result"],
         summary_rows
     )
-
+    # MILESTONE 15 - ADD NEW ASSESSMENT SHEETS
+    add_assessment_report_sheets(wb, analysis)
     output = BytesIO()
     wb.save(output)
     output.seek(0)

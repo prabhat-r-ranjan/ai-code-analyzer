@@ -489,15 +489,34 @@ def analyze_deployments(repo_root: Path) -> list[dict]:
             # CONFIGMAP
             # ----------------------------------
 
+            
             elif kind == "ConfigMap":
+                config_data = doc.get("data") or {}
+
                 result["configMap"] = {
-                    "keys": sorted(
-                        (doc.get("data") or {}).keys()
-                    ),
+                    "keys": sorted(config_data.keys()),
                     "binaryKeys": sorted(
                         (doc.get("binaryData") or {}).keys()
                     ),
+                    "database_endpoints": {
+                        key: value
+                        for key, value in config_data.items()
+                        if (
+                            key.upper() in {
+                                "SPRING_DATASOURCE_URL",
+                                "DATABASE_URL",
+                                "JDBC_URL",
+                            }
+                            and isinstance(value, str)
+                            and value.startswith("jdbc:")
+                            and "://" in value
+                            and "@" not in value.split("://", 1)[1].split("/", 1)[0]
+                            and "?" not in value
+                            and "#" not in value
+                        )
+                    },
                 }
+
 
             # ----------------------------------
             # SECRET (NO VALUES)

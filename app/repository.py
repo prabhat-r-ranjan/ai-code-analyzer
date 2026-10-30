@@ -10,6 +10,7 @@ from app.database_analyzer import analyze_databases
 from app.integration_analyzer import analyze_integrations
 from app.downstream_analyzer import analyze_downstream
 from app.deployment_analyzer import analyze_deployments
+from app.deployment_selector import analyze_deployment_selection
 
 def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
     parsed = urlparse(repo_url)
@@ -57,6 +58,11 @@ def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
         downstream_details = analyze_downstream(root)
         deployment_details = analyze_deployments(root)
 
+        selection_result = analyze_deployment_selection(
+            root,
+            deployment_details
+        )
+
         return {
             "repository": repo_url,
             "branch": branch or "default",
@@ -74,4 +80,5 @@ def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
             "downstream_count": len(downstream_details),
             "deployment_details": deployment_details,
             "deployment_count": len(deployment_details),
+            **selection_result,
         }

@@ -910,3 +910,116 @@ Through Milestones 1–13, the project has evolved from basic repository analysi
 The next development priorities are improving dependency correlation accuracy, enhancing assessment reporting, and extending discovery to live EKS environments.
 
 **Long-term objective:** Build a reusable, evidence-based assessment utility that helps migration engineers and solution architects accelerate Java microservice migration planning from AWS EKS to Azure AKS.
+
+### Milestone 16 — Deployment Selection and Evidence Discovery
+
+**Status: Initial implementation completed; Helm and Kustomize resolution improvements ongoing**
+
+Implemented repository-based deployment configuration discovery to distinguish Kubernetes manifest candidates from manifests referenced by deployment automation.
+
+**Implemented capabilities:**
+
+- Discover supported CI/CD deployment commands and Argo CD Application declarations.
+- Identify Helm, Kustomize and CI/CD configuration files.
+- Resolve supported static Kustomize resource references when a deployment entrypoint is identified.
+- Identify Kubernetes manifests referenced by supported deployment entrypoints.
+- Detect multiple candidate definitions of the same Kubernetes resource.
+- Record deployment evidence and unresolved references.
+- Preserve source-file traceability and deployment selection status.
+- Avoid treating repository manifests as confirmed running cluster resources.
+
+**New module:**
+
+```text
+app/deployment_selector.py
+```
+
+**Deployment approaches:**
+
+1. **Helm + Argo CD:** Partial support for Argo CD Application source discovery and Helm configuration identification. Helm template rendering and effective resource resolution are pending.
+2. **Kustomize:** Support for identifying base and overlay configurations and resolving supported static references. Automatic selection requires a detected deployment entrypoint.
+3. **Raw Kubernetes manifests:** Basic support for static `kubectl apply`, `replace` and `create` references.
+
+**Latest test repository findings:**
+
+| Assessment Item | Result |
+|---|---|
+| CI/CD configuration discovered | 1 |
+| Kustomize configurations discovered | 3 |
+| Deployment entrypoints detected | 0 |
+| Selected manifest files | 0 |
+| PostgreSQL duplicate resource conflicts | 3 |
+| Runtime verified | No |
+
+**Discovered configurations:**
+
+```text
+.github/workflows/backend-ci.yml
+k8s/base/kustomization.yaml
+k8s/demo/kustomization.yaml
+k8s/overlays/dev/kustomization.yaml
+```
+
+**Current deployment selection warning:**
+
+```text
+NO_DEPLOYMENT_ENTRYPOINT_FOUND
+```
+
+This warning indicates that no supported deployment entrypoint was detected. It does not establish that the application is undeployed.
+
+**Deployment selection statuses:**
+
+- `CANDIDATE_ONLY` — Manifest discovered without supported deployment selection evidence.
+- `SELECTED_BY_SOURCE` — Manifest referenced by a detected deployment entrypoint.
+- `runtime_verified: false` — Running cluster state has not been confirmed.
+
+**Additional assessment response fields:**
+
+```text
+deployment_selection
+deployment_entrypoints
+deployment_selection_conflicts
+deployment_selection_warnings
+deployment_evidence_inventory
+deployment_documentation_references
+deployment_evidence_summary
+runtime_verified
+```
+
+**Current limitations:**
+
+- Helm templates are not rendered.
+- Complete Argo CD Helm and Kustomize configuration resolution is pending.
+- External deployment pipelines may not be visible in the analyzed repository.
+- Kustomize overlays are not automatically considered active.
+- Actual running Kubernetes resources cannot be verified through repository analysis alone.
+- Duplicate manifest definitions remain unresolved without sufficient deployment evidence.
+
+**Next milestone — Deployment Configuration Resolution**
+
+Improve source-level analysis for both Helm + Argo CD and Kustomize deployment approaches, including environment-specific manifest mapping, source references, and unresolved deployment configurations.
+
+The objective is to produce accurate, evidence-based source-state microservice LLD inputs without claiming runtime deployment verification.
+
+Milestone 16.4: Kustomize base/overlay analysis और Helm + Argo CD source mapping.
+
+
+
+Milestone 16.5: Environment-wise manifest selection और conflict resolution.
+
+
+
+Milestone 17: Dependency correlation को selected manifest context से जोड़ना.
+
+
+
+Milestone 18: Existing 8-sheet Excel workbook में deployment findings integrate करना, बिना frozen 12-column Kubernetes LLD format बदले.
+
+
+
+Milestone 19: Multiple repositories पर testing और validation.
+
+
+
+Milestone 20: Demo-ready backend, error handling और assessment quality improvements.
