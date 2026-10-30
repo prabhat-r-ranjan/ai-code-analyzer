@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ai-code-analyzer
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: ai-code-analyzer
+
+  template:
+    metadata:
+      labels:
+        app: ai-code-analyzer
+
+    spec:
+      containers:
+        - name: ai-code-analyzer
+          image: ai-code-analyzer:v1
+
+          ports:
+            - containerPort: 8000

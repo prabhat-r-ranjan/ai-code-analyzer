@@ -9,6 +9,7 @@ from app.api_analyzer import analyze_apis
 from app.database_analyzer import analyze_databases
 from app.integration_analyzer import analyze_integrations
 from app.downstream_analyzer import analyze_downstream
+from app.deployment_analyzer import analyze_deployments
 
 def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
     parsed = urlparse(repo_url)
@@ -54,6 +55,8 @@ def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
         database_details = analyze_databases(root)
         integration_details = analyze_integrations(root)
         downstream_details = analyze_downstream(root)
+        deployment_details = analyze_deployments(root)
+
         return {
             "repository": repo_url,
             "branch": branch or "default",
@@ -69,4 +72,6 @@ def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
             "integration_count": len(integration_details),
             "downstream_details": downstream_details,
             "downstream_count": len(downstream_details),
+            "deployment_details": deployment_details,
+            "deployment_count": len(deployment_details),
         }
