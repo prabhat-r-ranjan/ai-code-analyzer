@@ -5,6 +5,10 @@ from urllib.parse import urlparse
 from app.technology_analyzer import analyze_technologies
 from git import Repo
 from app.technology_classifier import classify_technologies
+from app.api_analyzer import analyze_apis
+from app.database_analyzer import analyze_databases
+from app.integration_analyzer import analyze_integrations
+from app.downstream_analyzer import analyze_downstream
 
 def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
     parsed = urlparse(repo_url)
@@ -46,7 +50,10 @@ def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
                 "pom_file": pom_file,
                 **result
             })
-
+        api_endpoints = analyze_apis(root)
+        database_details = analyze_databases(root)
+        integration_details = analyze_integrations(root)
+        downstream_details = analyze_downstream(root)
         return {
             "repository": repo_url,
             "branch": branch or "default",
@@ -54,4 +61,12 @@ def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
             "pom_count": len(pom_files),
             "status": "completed",
             "technologies": technologies,
+            "api_endpoints": api_endpoints,
+            "api_count": len(api_endpoints),
+            "database_details": database_details,
+            "database_count": len(database_details),
+            "integration_details": integration_details,
+            "integration_count": len(integration_details),
+            "downstream_details": downstream_details,
+            "downstream_count": len(downstream_details),
         }
