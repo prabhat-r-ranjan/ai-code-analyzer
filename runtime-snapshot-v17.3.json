@@ -1,0 +1,1635 @@
+{
+  "context": "incident-aks",
+  "namespace": "monitoring",
+  "captured_at_utc": "2026-10-30T15:46:08.069555+00:00",
+  "source": "KUBERNETES_API_READ_ONLY",
+  "runtime_verified": true,
+  "resources": {
+    "deployments": [
+      {
+        "name": "cluster-alloy",
+        "namespace": "monitoring",
+        "kind": "Deployment",
+        "labels": {
+          "app.kubernetes.io/instance": "cluster-alloy",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "alloy",
+          "app.kubernetes.io/part-of": "alloy",
+          "app.kubernetes.io/version": "v1.20.1",
+          "helm.sh/chart": "alloy-1.13.1"
+        },
+        "pod_labels": {
+          "app.kubernetes.io/instance": "cluster-alloy",
+          "app.kubernetes.io/name": "alloy"
+        },
+        "replicas_desired": 1,
+        "replicas_ready": 1,
+        "images": [
+          "docker.io/grafana/alloy:v1.20.1",
+          "quay.io/prometheus-operator/prometheus-config-reloader:v0.94.0@sha256:142a1f11df8dd165f00375b0b1826aecb9c9adeb05c39855893138d7c7575ff7"
+        ],
+        "service_account": "cluster-alloy",
+        "configmap_refs": [
+          "cluster-alloy"
+        ],
+        "secret_refs": [],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "cluster-alloy",
+            "via": "volume/config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-grafana",
+        "namespace": "monitoring",
+        "kind": "Deployment",
+        "labels": {
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "grafana",
+          "app.kubernetes.io/version": "13.1.0",
+          "helm.sh/chart": "grafana-12.6.0"
+        },
+        "pod_labels": {
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/name": "grafana",
+          "app.kubernetes.io/version": "13.1.0",
+          "helm.sh/chart": "grafana-12.6.0"
+        },
+        "replicas_desired": 1,
+        "replicas_ready": 1,
+        "images": [
+          "quay.io/kiwigrid/k8s-sidecar:2.8.0",
+          "quay.io/kiwigrid/k8s-sidecar:2.8.0",
+          "docker.io/grafana/grafana:13.1.0"
+        ],
+        "service_account": "monitoring-grafana",
+        "configmap_refs": [
+          "monitoring-grafana",
+          "monitoring-grafana-config-dashboards"
+        ],
+        "secret_refs": [
+          "monitoring-grafana"
+        ],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "monitoring-grafana",
+            "via": "volume/config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "monitoring-grafana-config-dashboards",
+            "via": "volume/sc-dashboard-provider",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana-sc-dashboard/env/REQ_PASSWORD",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana-sc-dashboard/env/REQ_USERNAME",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana-sc-datasources/env/REQ_PASSWORD",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana-sc-datasources/env/REQ_USERNAME",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana/env/GF_SECURITY_ADMIN_PASSWORD",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana/env/GF_SECURITY_ADMIN_USER",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-operator",
+        "namespace": "monitoring",
+        "kind": "Deployment",
+        "labels": {
+          "app": "kube-prometheus-stack-operator",
+          "app.kubernetes.io/component": "prometheus-operator",
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "kube-prometheus-stack-prometheus-operator",
+          "app.kubernetes.io/part-of": "kube-prometheus-stack",
+          "app.kubernetes.io/version": "87.1.0",
+          "chart": "kube-prometheus-stack-87.1.0",
+          "heritage": "Helm",
+          "release": "monitoring"
+        },
+        "pod_labels": {
+          "app": "kube-prometheus-stack-operator",
+          "app.kubernetes.io/component": "prometheus-operator",
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "kube-prometheus-stack-prometheus-operator",
+          "app.kubernetes.io/part-of": "kube-prometheus-stack",
+          "app.kubernetes.io/version": "87.1.0",
+          "chart": "kube-prometheus-stack-87.1.0",
+          "heritage": "Helm",
+          "release": "monitoring"
+        },
+        "replicas_desired": 1,
+        "replicas_ready": 1,
+        "images": [
+          "quay.io/prometheus-operator/prometheus-operator:v0.92.0"
+        ],
+        "service_account": "monitoring-kube-prometheus-operator",
+        "configmap_refs": [],
+        "secret_refs": [
+          "monitoring-kube-prometheus-admission"
+        ],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "Secret",
+            "name": "monitoring-kube-prometheus-admission",
+            "via": "volume/tls-secret",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-kube-state-metrics",
+        "namespace": "monitoring",
+        "kind": "Deployment",
+        "labels": {
+          "app.kubernetes.io/component": "metrics",
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "kube-state-metrics",
+          "app.kubernetes.io/part-of": "kube-state-metrics",
+          "app.kubernetes.io/version": "2.19.1",
+          "helm.sh/chart": "kube-state-metrics-7.5.1",
+          "release": "monitoring"
+        },
+        "pod_labels": {
+          "app.kubernetes.io/component": "metrics",
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "kube-state-metrics",
+          "app.kubernetes.io/part-of": "kube-state-metrics",
+          "app.kubernetes.io/version": "2.19.1",
+          "helm.sh/chart": "kube-state-metrics-7.5.1",
+          "release": "monitoring"
+        },
+        "replicas_desired": 1,
+        "replicas_ready": 1,
+        "images": [
+          "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.19.1"
+        ],
+        "service_account": "monitoring-kube-state-metrics",
+        "configmap_refs": [],
+        "secret_refs": [],
+        "pvc_refs": [],
+        "dependency_references": []
+      }
+    ],
+    "statefulsets": [
+      {
+        "name": "alertmanager-monitoring-kube-prometheus-alertmanager",
+        "namespace": "monitoring",
+        "kind": "StatefulSet",
+        "labels": {
+          "alertmanager": "monitoring-kube-prometheus-alertmanager",
+          "app": "kube-prometheus-stack-alertmanager",
+          "app.kubernetes.io/instance": "monitoring-kube-prometheus-alertmanager",
+          "app.kubernetes.io/managed-by": "prometheus-operator",
+          "app.kubernetes.io/name": "alertmanager",
+          "app.kubernetes.io/part-of": "kube-prometheus-stack",
+          "app.kubernetes.io/version": "87.1.0",
+          "chart": "kube-prometheus-stack-87.1.0",
+          "heritage": "Helm",
+          "managed-by": "prometheus-operator",
+          "release": "monitoring"
+        },
+        "pod_labels": {
+          "alertmanager": "monitoring-kube-prometheus-alertmanager",
+          "app.kubernetes.io/instance": "monitoring-kube-prometheus-alertmanager",
+          "app.kubernetes.io/managed-by": "prometheus-operator",
+          "app.kubernetes.io/name": "alertmanager",
+          "app.kubernetes.io/version": "0.33.0"
+        },
+        "replicas_desired": 1,
+        "replicas_ready": 1,
+        "images": [
+          "quay.io/prometheus-operator/prometheus-config-reloader:v0.92.0",
+          "quay.io/prometheus/alertmanager:v0.33.0",
+          "quay.io/prometheus-operator/prometheus-config-reloader:v0.92.0"
+        ],
+        "service_account": "monitoring-kube-prometheus-alertmanager",
+        "configmap_refs": [],
+        "secret_refs": [
+          "alertmanager-monitoring-kube-prometheus-alertmanager-cluster-tls-config",
+          "alertmanager-monitoring-kube-prometheus-alertmanager-generated",
+          "alertmanager-monitoring-kube-prometheus-alertmanager-tls-assets-0",
+          "alertmanager-monitoring-kube-prometheus-alertmanager-web-config"
+        ],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "Secret",
+            "name": "alertmanager-monitoring-kube-prometheus-alertmanager-cluster-tls-config",
+            "via": "volume/cluster-tls-config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "alertmanager-monitoring-kube-prometheus-alertmanager-generated",
+            "via": "volume/config-volume",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "alertmanager-monitoring-kube-prometheus-alertmanager-tls-assets-0",
+            "via": "volume/tls-assets/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "alertmanager-monitoring-kube-prometheus-alertmanager-web-config",
+            "via": "volume/web-config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          }
+        ]
+      },
+      {
+        "name": "prometheus-monitoring-kube-prometheus-prometheus",
+        "namespace": "monitoring",
+        "kind": "StatefulSet",
+        "labels": {
+          "app": "kube-prometheus-stack-prometheus",
+          "app.kubernetes.io/instance": "monitoring-kube-prometheus-prometheus",
+          "app.kubernetes.io/managed-by": "prometheus-operator",
+          "app.kubernetes.io/name": "prometheus",
+          "app.kubernetes.io/part-of": "kube-prometheus-stack",
+          "app.kubernetes.io/version": "87.1.0",
+          "chart": "kube-prometheus-stack-87.1.0",
+          "heritage": "Helm",
+          "managed-by": "prometheus-operator",
+          "operator.prometheus.io/mode": "server",
+          "operator.prometheus.io/name": "monitoring-kube-prometheus-prometheus",
+          "operator.prometheus.io/shard": "0",
+          "prometheus": "monitoring-kube-prometheus-prometheus",
+          "release": "monitoring"
+        },
+        "pod_labels": {
+          "app.kubernetes.io/instance": "monitoring-kube-prometheus-prometheus",
+          "app.kubernetes.io/managed-by": "prometheus-operator",
+          "app.kubernetes.io/name": "prometheus",
+          "app.kubernetes.io/version": "3.12.0-distroless",
+          "operator.prometheus.io/name": "monitoring-kube-prometheus-prometheus",
+          "operator.prometheus.io/shard": "0",
+          "prometheus": "monitoring-kube-prometheus-prometheus"
+        },
+        "replicas_desired": 1,
+        "replicas_ready": 1,
+        "images": [
+          "quay.io/prometheus-operator/prometheus-config-reloader:v0.92.0",
+          "quay.io/prometheus/prometheus:v3.12.0-distroless",
+          "quay.io/prometheus-operator/prometheus-config-reloader:v0.92.0"
+        ],
+        "service_account": "monitoring-kube-prometheus-prometheus",
+        "configmap_refs": [
+          "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-0",
+          "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-1",
+          "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-2"
+        ],
+        "secret_refs": [
+          "prometheus-monitoring-kube-prometheus-prometheus",
+          "prometheus-monitoring-kube-prometheus-prometheus-tls-assets-0",
+          "prometheus-monitoring-kube-prometheus-prometheus-web-config"
+        ],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-0",
+            "via": "volume/prometheus-monitoring-kube-prometheus-prometheus-rulefiles-0",
+            "optional": true,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-1",
+            "via": "volume/prometheus-monitoring-kube-prometheus-prometheus-rulefiles-1",
+            "optional": true,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_NOT_FOUND",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-2",
+            "via": "volume/prometheus-monitoring-kube-prometheus-prometheus-rulefiles-2",
+            "optional": true,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_NOT_FOUND",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "Secret",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus",
+            "via": "volume/config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-tls-assets-0",
+            "via": "volume/tls-assets/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-web-config",
+            "via": "volume/web-config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          }
+        ]
+      }
+    ],
+    "daemonsets": [
+      {
+        "name": "monitoring-prometheus-node-exporter",
+        "namespace": "monitoring",
+        "kind": "DaemonSet",
+        "labels": {
+          "app.kubernetes.io/component": "metrics",
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "prometheus-node-exporter",
+          "app.kubernetes.io/part-of": "prometheus-node-exporter",
+          "app.kubernetes.io/version": "1.11.1",
+          "helm.sh/chart": "prometheus-node-exporter-4.55.0",
+          "release": "monitoring"
+        },
+        "pod_labels": {
+          "app.kubernetes.io/component": "metrics",
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "prometheus-node-exporter",
+          "app.kubernetes.io/part-of": "prometheus-node-exporter",
+          "app.kubernetes.io/version": "1.11.1",
+          "helm.sh/chart": "prometheus-node-exporter-4.55.0",
+          "jobLabel": "node-exporter",
+          "release": "monitoring"
+        },
+        "replicas_desired": 1,
+        "replicas_ready": 1,
+        "images": [
+          "quay.io/prometheus/node-exporter:v1.11.1-distroless"
+        ],
+        "service_account": "monitoring-prometheus-node-exporter",
+        "configmap_refs": [],
+        "secret_refs": [],
+        "pvc_refs": [],
+        "dependency_references": []
+      },
+      {
+        "name": "node-alloy",
+        "namespace": "monitoring",
+        "kind": "DaemonSet",
+        "labels": {
+          "app.kubernetes.io/instance": "node-alloy",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "alloy",
+          "app.kubernetes.io/part-of": "alloy",
+          "app.kubernetes.io/version": "v1.20.1",
+          "helm.sh/chart": "alloy-1.13.1"
+        },
+        "pod_labels": {
+          "app.kubernetes.io/instance": "node-alloy",
+          "app.kubernetes.io/name": "alloy"
+        },
+        "replicas_desired": 1,
+        "replicas_ready": 1,
+        "images": [
+          "docker.io/grafana/alloy:v1.20.1",
+          "quay.io/prometheus-operator/prometheus-config-reloader:v0.94.0@sha256:142a1f11df8dd165f00375b0b1826aecb9c9adeb05c39855893138d7c7575ff7"
+        ],
+        "service_account": "node-alloy",
+        "configmap_refs": [
+          "node-alloy"
+        ],
+        "secret_refs": [],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "node-alloy",
+            "via": "volume/config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          }
+        ]
+      }
+    ],
+    "services": [
+      {
+        "name": "alertmanager-operated",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/name": "alertmanager"
+        },
+        "ports": [
+          {
+            "port": 9093,
+            "target_port": "http-web",
+            "protocol": "TCP"
+          },
+          {
+            "port": 9094,
+            "target_port": "mesh-tcp",
+            "protocol": "TCP"
+          },
+          {
+            "port": 9094,
+            "target_port": "mesh-udp",
+            "protocol": "UDP"
+          }
+        ]
+      },
+      {
+        "name": "cluster-alloy",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/instance": "cluster-alloy",
+          "app.kubernetes.io/name": "alloy"
+        },
+        "ports": [
+          {
+            "port": 12345,
+            "target_port": "12345",
+            "protocol": "TCP"
+          }
+        ]
+      },
+      {
+        "name": "cluster-alloy-cluster",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/instance": "cluster-alloy",
+          "app.kubernetes.io/name": "alloy"
+        },
+        "ports": [
+          {
+            "port": 12345,
+            "target_port": "12345",
+            "protocol": "TCP"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-grafana",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/name": "grafana"
+        },
+        "ports": [
+          {
+            "port": 80,
+            "target_port": "grafana",
+            "protocol": "TCP"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-alertmanager",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "alertmanager": "monitoring-kube-prometheus-alertmanager",
+          "app.kubernetes.io/name": "alertmanager"
+        },
+        "ports": [
+          {
+            "port": 9093,
+            "target_port": "9093",
+            "protocol": "TCP"
+          },
+          {
+            "port": 8080,
+            "target_port": "reloader-web",
+            "protocol": "TCP"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-operator",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app": "kube-prometheus-stack-operator",
+          "release": "monitoring"
+        },
+        "ports": [
+          {
+            "port": 443,
+            "target_port": "https",
+            "protocol": "TCP"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-prometheus",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/name": "prometheus",
+          "operator.prometheus.io/name": "monitoring-kube-prometheus-prometheus"
+        },
+        "ports": [
+          {
+            "port": 9090,
+            "target_port": "9090",
+            "protocol": "TCP"
+          },
+          {
+            "port": 8080,
+            "target_port": "reloader-web",
+            "protocol": "TCP"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-kube-state-metrics",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/name": "kube-state-metrics"
+        },
+        "ports": [
+          {
+            "port": 8080,
+            "target_port": "http",
+            "protocol": "TCP"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-prometheus-node-exporter",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/name": "prometheus-node-exporter"
+        },
+        "ports": [
+          {
+            "port": 9100,
+            "target_port": "9100",
+            "protocol": "TCP"
+          }
+        ]
+      },
+      {
+        "name": "node-alloy",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/instance": "node-alloy",
+          "app.kubernetes.io/name": "alloy"
+        },
+        "ports": [
+          {
+            "port": 12345,
+            "target_port": "12345",
+            "protocol": "TCP"
+          }
+        ]
+      },
+      {
+        "name": "prometheus-operated",
+        "namespace": "monitoring",
+        "type": "ClusterIP",
+        "selector": {
+          "app.kubernetes.io/name": "prometheus"
+        },
+        "ports": [
+          {
+            "port": 9090,
+            "target_port": "http-web",
+            "protocol": "TCP"
+          }
+        ]
+      }
+    ],
+    "pods": [
+      {
+        "name": "alertmanager-monitoring-kube-prometheus-alertmanager-0",
+        "namespace": "monitoring",
+        "labels": {
+          "alertmanager": "monitoring-kube-prometheus-alertmanager",
+          "app.kubernetes.io/instance": "monitoring-kube-prometheus-alertmanager",
+          "app.kubernetes.io/managed-by": "prometheus-operator",
+          "app.kubernetes.io/name": "alertmanager",
+          "app.kubernetes.io/version": "0.33.0",
+          "apps.kubernetes.io/pod-index": "0",
+          "controller-revision-hash": "alertmanager-monitoring-kube-prometheus-alertmanager-76cb788748",
+          "statefulset.kubernetes.io/pod-name": "alertmanager-monitoring-kube-prometheus-alertmanager-0"
+        },
+        "phase": "Running",
+        "node": "aks-agentpool-42534944-vmss00000z",
+        "containers_ready": 3,
+        "containers_total": 3,
+        "restart_count": 0,
+        "owner_references": [
+          {
+            "kind": "StatefulSet",
+            "name": "alertmanager-monitoring-kube-prometheus-alertmanager"
+          }
+        ],
+        "service_account": "monitoring-kube-prometheus-alertmanager",
+        "configmap_refs": [
+          "kube-root-ca.crt"
+        ],
+        "secret_refs": [
+          "alertmanager-monitoring-kube-prometheus-alertmanager-cluster-tls-config",
+          "alertmanager-monitoring-kube-prometheus-alertmanager-generated",
+          "alertmanager-monitoring-kube-prometheus-alertmanager-tls-assets-0",
+          "alertmanager-monitoring-kube-prometheus-alertmanager-web-config"
+        ],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "kube-root-ca.crt",
+            "via": "volume/kube-api-access-k5g9t/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "Secret",
+            "name": "alertmanager-monitoring-kube-prometheus-alertmanager-cluster-tls-config",
+            "via": "volume/cluster-tls-config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "alertmanager-monitoring-kube-prometheus-alertmanager-generated",
+            "via": "volume/config-volume",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "alertmanager-monitoring-kube-prometheus-alertmanager-tls-assets-0",
+            "via": "volume/tls-assets/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "alertmanager-monitoring-kube-prometheus-alertmanager-web-config",
+            "via": "volume/web-config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          }
+        ]
+      },
+      {
+        "name": "cluster-alloy-79588f4cd5-wr8wx",
+        "namespace": "monitoring",
+        "labels": {
+          "app.kubernetes.io/instance": "cluster-alloy",
+          "app.kubernetes.io/name": "alloy",
+          "pod-template-hash": "79588f4cd5"
+        },
+        "phase": "Running",
+        "node": "aks-agentpool-42534944-vmss00000z",
+        "containers_ready": 2,
+        "containers_total": 2,
+        "restart_count": 0,
+        "owner_references": [
+          {
+            "kind": "ReplicaSet",
+            "name": "cluster-alloy-79588f4cd5"
+          }
+        ],
+        "service_account": "cluster-alloy",
+        "configmap_refs": [
+          "cluster-alloy",
+          "kube-root-ca.crt"
+        ],
+        "secret_refs": [],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "cluster-alloy",
+            "via": "volume/config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "kube-root-ca.crt",
+            "via": "volume/kube-api-access-k9bjf/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-grafana-758b69f4fd-7kg8r",
+        "namespace": "monitoring",
+        "labels": {
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/name": "grafana",
+          "app.kubernetes.io/version": "13.1.0",
+          "helm.sh/chart": "grafana-12.6.0",
+          "pod-template-hash": "758b69f4fd"
+        },
+        "phase": "Running",
+        "node": "aks-agentpool-42534944-vmss00000z",
+        "containers_ready": 3,
+        "containers_total": 3,
+        "restart_count": 0,
+        "owner_references": [
+          {
+            "kind": "ReplicaSet",
+            "name": "monitoring-grafana-758b69f4fd"
+          }
+        ],
+        "service_account": "monitoring-grafana",
+        "configmap_refs": [
+          "kube-root-ca.crt",
+          "monitoring-grafana",
+          "monitoring-grafana-config-dashboards"
+        ],
+        "secret_refs": [
+          "monitoring-grafana"
+        ],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "kube-root-ca.crt",
+            "via": "volume/kube-api-access-dh5qk/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "monitoring-grafana",
+            "via": "volume/config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "monitoring-grafana-config-dashboards",
+            "via": "volume/sc-dashboard-provider",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana-sc-dashboard/env/REQ_PASSWORD",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana-sc-dashboard/env/REQ_USERNAME",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana-sc-datasources/env/REQ_PASSWORD",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana-sc-datasources/env/REQ_USERNAME",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana/env/GF_SECURITY_ADMIN_PASSWORD",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-grafana",
+            "via": "container/grafana/env/GF_SECURITY_ADMIN_USER",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-operator-5949d5dfdf-c46jf",
+        "namespace": "monitoring",
+        "labels": {
+          "app": "kube-prometheus-stack-operator",
+          "app.kubernetes.io/component": "prometheus-operator",
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "kube-prometheus-stack-prometheus-operator",
+          "app.kubernetes.io/part-of": "kube-prometheus-stack",
+          "app.kubernetes.io/version": "87.1.0",
+          "chart": "kube-prometheus-stack-87.1.0",
+          "heritage": "Helm",
+          "pod-template-hash": "5949d5dfdf",
+          "release": "monitoring"
+        },
+        "phase": "Running",
+        "node": "aks-agentpool-42534944-vmss00000z",
+        "containers_ready": 1,
+        "containers_total": 1,
+        "restart_count": 0,
+        "owner_references": [
+          {
+            "kind": "ReplicaSet",
+            "name": "monitoring-kube-prometheus-operator-5949d5dfdf"
+          }
+        ],
+        "service_account": "monitoring-kube-prometheus-operator",
+        "configmap_refs": [
+          "kube-root-ca.crt"
+        ],
+        "secret_refs": [
+          "monitoring-kube-prometheus-admission"
+        ],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "kube-root-ca.crt",
+            "via": "volume/kube-api-access-jhtc9/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "Secret",
+            "name": "monitoring-kube-prometheus-admission",
+            "via": "volume/tls-secret",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-kube-state-metrics-567d85f95f-lq68c",
+        "namespace": "monitoring",
+        "labels": {
+          "app.kubernetes.io/component": "metrics",
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "kube-state-metrics",
+          "app.kubernetes.io/part-of": "kube-state-metrics",
+          "app.kubernetes.io/version": "2.19.1",
+          "helm.sh/chart": "kube-state-metrics-7.5.1",
+          "pod-template-hash": "567d85f95f",
+          "release": "monitoring"
+        },
+        "phase": "Running",
+        "node": "aks-agentpool-42534944-vmss00000z",
+        "containers_ready": 1,
+        "containers_total": 1,
+        "restart_count": 0,
+        "owner_references": [
+          {
+            "kind": "ReplicaSet",
+            "name": "monitoring-kube-state-metrics-567d85f95f"
+          }
+        ],
+        "service_account": "monitoring-kube-state-metrics",
+        "configmap_refs": [
+          "kube-root-ca.crt"
+        ],
+        "secret_refs": [],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "kube-root-ca.crt",
+            "via": "volume/kube-api-access-kkv8x/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          }
+        ]
+      },
+      {
+        "name": "monitoring-prometheus-node-exporter-2m8tj",
+        "namespace": "monitoring",
+        "labels": {
+          "app.kubernetes.io/component": "metrics",
+          "app.kubernetes.io/instance": "monitoring",
+          "app.kubernetes.io/managed-by": "Helm",
+          "app.kubernetes.io/name": "prometheus-node-exporter",
+          "app.kubernetes.io/part-of": "prometheus-node-exporter",
+          "app.kubernetes.io/version": "1.11.1",
+          "controller-revision-hash": "5fdf759879",
+          "helm.sh/chart": "prometheus-node-exporter-4.55.0",
+          "jobLabel": "node-exporter",
+          "pod-template-generation": "1",
+          "release": "monitoring"
+        },
+        "phase": "Running",
+        "node": "aks-agentpool-42534944-vmss00000z",
+        "containers_ready": 1,
+        "containers_total": 1,
+        "restart_count": 0,
+        "owner_references": [
+          {
+            "kind": "DaemonSet",
+            "name": "monitoring-prometheus-node-exporter"
+          }
+        ],
+        "service_account": "monitoring-prometheus-node-exporter",
+        "configmap_refs": [],
+        "secret_refs": [],
+        "pvc_refs": [],
+        "dependency_references": []
+      },
+      {
+        "name": "node-alloy-9d4wt",
+        "namespace": "monitoring",
+        "labels": {
+          "app.kubernetes.io/instance": "node-alloy",
+          "app.kubernetes.io/name": "alloy",
+          "controller-revision-hash": "5994b48c78",
+          "pod-template-generation": "1"
+        },
+        "phase": "Running",
+        "node": "aks-agentpool-42534944-vmss00000z",
+        "containers_ready": 2,
+        "containers_total": 2,
+        "restart_count": 0,
+        "owner_references": [
+          {
+            "kind": "DaemonSet",
+            "name": "node-alloy"
+          }
+        ],
+        "service_account": "node-alloy",
+        "configmap_refs": [
+          "kube-root-ca.crt",
+          "node-alloy"
+        ],
+        "secret_refs": [],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "kube-root-ca.crt",
+            "via": "volume/kube-api-access-rf4fn/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "node-alloy",
+            "via": "volume/config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          }
+        ]
+      },
+      {
+        "name": "prometheus-monitoring-kube-prometheus-prometheus-0",
+        "namespace": "monitoring",
+        "labels": {
+          "app.kubernetes.io/instance": "monitoring-kube-prometheus-prometheus",
+          "app.kubernetes.io/managed-by": "prometheus-operator",
+          "app.kubernetes.io/name": "prometheus",
+          "app.kubernetes.io/version": "3.12.0-distroless",
+          "apps.kubernetes.io/pod-index": "0",
+          "controller-revision-hash": "prometheus-monitoring-kube-prometheus-prometheus-5fdbbc867f",
+          "operator.prometheus.io/name": "monitoring-kube-prometheus-prometheus",
+          "operator.prometheus.io/shard": "0",
+          "prometheus": "monitoring-kube-prometheus-prometheus",
+          "statefulset.kubernetes.io/pod-name": "prometheus-monitoring-kube-prometheus-prometheus-0"
+        },
+        "phase": "Running",
+        "node": "aks-agentpool-42534944-vmss00000z",
+        "containers_ready": 3,
+        "containers_total": 3,
+        "restart_count": 0,
+        "owner_references": [
+          {
+            "kind": "StatefulSet",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus"
+          }
+        ],
+        "service_account": "monitoring-kube-prometheus-prometheus",
+        "configmap_refs": [
+          "kube-root-ca.crt",
+          "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-0",
+          "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-1",
+          "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-2"
+        ],
+        "secret_refs": [
+          "prometheus-monitoring-kube-prometheus-prometheus",
+          "prometheus-monitoring-kube-prometheus-prometheus-tls-assets-0",
+          "prometheus-monitoring-kube-prometheus-prometheus-web-config"
+        ],
+        "pvc_refs": [],
+        "dependency_references": [
+          {
+            "kind": "ConfigMap",
+            "name": "kube-root-ca.crt",
+            "via": "volume/kube-api-access-cxdb8/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-0",
+            "via": "volume/prometheus-monitoring-kube-prometheus-prometheus-rulefiles-0",
+            "optional": true,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_EXISTS",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-1",
+            "via": "volume/prometheus-monitoring-kube-prometheus-prometheus-rulefiles-1",
+            "optional": true,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_NOT_FOUND",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "ConfigMap",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-2",
+            "via": "volume/prometheus-monitoring-kube-prometheus-prometheus-rulefiles-2",
+            "optional": true,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "TARGET_NOT_FOUND",
+            "target_evidence": "NAMESPACE_RESOURCE_NAME_INVENTORY"
+          },
+          {
+            "kind": "Secret",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus",
+            "via": "volume/config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-tls-assets-0",
+            "via": "volume/tls-assets/projected",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          },
+          {
+            "kind": "Secret",
+            "name": "prometheus-monitoring-kube-prometheus-prometheus-web-config",
+            "via": "volume/web-config",
+            "optional": null,
+            "evidence": "KUBERNETES_POD_SPEC",
+            "target_status": "NOT_VERIFIED",
+            "target_evidence": "TARGET_INVENTORY_UNAVAILABLE_OR_NOT_COLLECTED"
+          }
+        ]
+      }
+    ],
+    "hpas": [],
+    "pvcs": [],
+    "serviceaccounts": [
+      {
+        "name": "cluster-alloy",
+        "annotations": {}
+      },
+      {
+        "name": "default",
+        "annotations": {}
+      },
+      {
+        "name": "monitoring-grafana",
+        "annotations": {}
+      },
+      {
+        "name": "monitoring-kube-prometheus-alertmanager",
+        "annotations": {}
+      },
+      {
+        "name": "monitoring-kube-prometheus-operator",
+        "annotations": {}
+      },
+      {
+        "name": "monitoring-kube-prometheus-prometheus",
+        "annotations": {}
+      },
+      {
+        "name": "monitoring-kube-state-metrics",
+        "annotations": {}
+      },
+      {
+        "name": "monitoring-prometheus-node-exporter",
+        "annotations": {}
+      },
+      {
+        "name": "node-alloy",
+        "annotations": {}
+      }
+    ],
+    "configmaps": [
+      {
+        "name": "cluster-alloy",
+        "keys": [
+          "config.alloy"
+        ]
+      },
+      {
+        "name": "kube-root-ca.crt",
+        "keys": [
+          "ca.crt"
+        ]
+      },
+      {
+        "name": "monitoring-grafana",
+        "keys": [
+          "grafana.ini"
+        ]
+      },
+      {
+        "name": "monitoring-grafana-config-dashboards",
+        "keys": [
+          "provider.yaml"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-alertmanager-overview",
+        "keys": [
+          "alertmanager-overview.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-apiserver",
+        "keys": [
+          "apiserver.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-cluster-total",
+        "keys": [
+          "cluster-total.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-controller-manager",
+        "keys": [
+          "controller-manager.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-etcd",
+        "keys": [
+          "etcd.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-grafana-datasource",
+        "keys": [
+          "datasource.yaml"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-grafana-overview",
+        "keys": [
+          "grafana-overview.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-k8s-coredns",
+        "keys": [
+          "k8s-coredns.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-k8s-resources-cluster",
+        "keys": [
+          "k8s-resources-cluster.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-k8s-resources-multicluster",
+        "keys": [
+          "k8s-resources-multicluster.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-k8s-resources-namespace",
+        "keys": [
+          "k8s-resources-namespace.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-k8s-resources-node",
+        "keys": [
+          "k8s-resources-node.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-k8s-resources-pod",
+        "keys": [
+          "k8s-resources-pod.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-k8s-resources-workload",
+        "keys": [
+          "k8s-resources-workload.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-k8s-resources-workloads-namespace",
+        "keys": [
+          "k8s-resources-workloads-namespace.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-kubelet",
+        "keys": [
+          "kubelet.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-namespace-by-pod",
+        "keys": [
+          "namespace-by-pod.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-namespace-by-workload",
+        "keys": [
+          "namespace-by-workload.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-node-cluster-rsrc-use",
+        "keys": [
+          "node-cluster-rsrc-use.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-node-rsrc-use",
+        "keys": [
+          "node-rsrc-use.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-nodes",
+        "keys": [
+          "nodes.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-nodes-aix",
+        "keys": [
+          "nodes-aix.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-nodes-darwin",
+        "keys": [
+          "nodes-darwin.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-persistentvolumesusage",
+        "keys": [
+          "persistentvolumesusage.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-pod-total",
+        "keys": [
+          "pod-total.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-prometheus",
+        "keys": [
+          "prometheus.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-proxy",
+        "keys": [
+          "proxy.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-scheduler",
+        "keys": [
+          "scheduler.json"
+        ]
+      },
+      {
+        "name": "monitoring-kube-prometheus-workload-total",
+        "keys": [
+          "workload-total.json"
+        ]
+      },
+      {
+        "name": "node-alloy",
+        "keys": [
+          "config.alloy"
+        ]
+      },
+      {
+        "name": "prometheus-monitoring-kube-prometheus-prometheus-rulefiles-0",
+        "keys": [
+          "monitoring-monitoring-kube-prometheus-alertmanager.rules-b4b88c42-26cd-4168-886d-6733fee3d130.yaml",
+          "monitoring-monitoring-kube-prometheus-config-reloaders-a7319e5c-3f26-42d5-84a9-d2362d5c0c81.yaml",
+          "monitoring-monitoring-kube-prometheus-etcd-aef75abf-b83b-4480-8808-f251e24655ca.yaml",
+          "monitoring-monitoring-kube-prometheus-general.rules-366c84ab-e8e7-4d6b-a49d-32e316f8bac3.yaml",
+          "monitoring-monitoring-kube-prometheus-k8s.rules.container-cpu-usage-second-50967ae6-a5fa-458b-8818-0ab761f752e5.yaml",
+          "monitoring-monitoring-kube-prometheus-k8s.rules.container-memory-cache-3746a5e0-7ee7-483b-93fa-1d0c92a30f4e.yaml",
+          "monitoring-monitoring-kube-prometheus-k8s.rules.container-memory-rss-0823f480-50f7-44fd-9729-90a46aed59ee.yaml",
+          "monitoring-monitoring-kube-prometheus-k8s.rules.container-memory-swap-8f0c7891-4c0d-49f8-b27b-678c9c25b26b.yaml",
+          "monitoring-monitoring-kube-prometheus-k8s.rules.container-memory-working-s-860c300b-9948-4150-a545-72d84840aa6d.yaml",
+          "monitoring-monitoring-kube-prometheus-k8s.rules.container-resource-111d8e4b-26ec-4d40-a67d-f83812993ffe.yaml",
+          "monitoring-monitoring-kube-prometheus-k8s.rules.pod-owner-bde0cac7-639e-4909-8310-f6eb8b923385.yaml",
+          "monitoring-monitoring-kube-prometheus-kube-apiserver-availability.rules-2404b1ea-2909-4d78-8a03-69d0427081a1.yaml",
+          "monitoring-monitoring-kube-prometheus-kube-apiserver-burnrate.rules-9dfb35ae-743c-4862-b348-c1f66b935001.yaml",
+          "monitoring-monitoring-kube-prometheus-kube-apiserver-histogram.rules-627a8c09-3958-433c-8066-f8665e81e5d4.yaml",
+          "monitoring-monitoring-kube-prometheus-kube-apiserver-slos-5cfa6bb5-d439-41ae-a3df-a5f4e756f603.yaml",
+          "monitoring-monitoring-kube-prometheus-kube-prometheus-general.rules-b201bec4-3bc8-4c7a-b9b0-fa42ab589f1d.yaml",
+          "monitoring-monitoring-kube-prometheus-kube-prometheus-node-recording.rules-75230008-ab36-49a9-9dcb-6c5315a58a6c.yaml",
+          "monitoring-monitoring-kube-prometheus-kube-scheduler.rules-654a3553-a224-41a6-9c9b-734fbb6ed896.yaml",
+          "monitoring-monitoring-kube-prometheus-kube-state-metrics-35a254ee-518c-447c-9244-44d69bb4abc9.yaml",
+          "monitoring-monitoring-kube-prometheus-kubelet.rules-97059212-4304-4120-b5c3-028f727f92cb.yaml",
+          "monitoring-monitoring-kube-prometheus-kubernetes-apps-578aa547-0f1f-4439-b8b0-3804f5c8a3e0.yaml",
+          "monitoring-monitoring-kube-prometheus-kubernetes-resources-32cad412-d22d-4e3a-8c2e-bec791aaecd7.yaml",
+          "monitoring-monitoring-kube-prometheus-kubernetes-storage-876d8c20-3075-4eb2-b7e5-0aafa4d32eb1.yaml",
+          "monitoring-monitoring-kube-prometheus-kubernetes-system-7dbba4e9-6c2a-4844-a372-6217c3068df0.yaml",
+          "monitoring-monitoring-kube-prometheus-kubernetes-system-apiserver-1512b2d0-f522-4278-a85a-cbdfd1608274.yaml",
+          "monitoring-monitoring-kube-prometheus-kubernetes-system-controller-manager-4c0b63ad-c8ba-472f-80e4-cd5f366bf105.yaml",
+          "monitoring-monitoring-kube-prometheus-kubernetes-system-kube-proxy-689a4486-edbd-4c35-9e97-2b1f0a78b5be.yaml",
+          "monitoring-monitoring-kube-prometheus-kubernetes-system-kubelet-bd588315-05f3-46f8-98f7-c5e640229a5f.yaml",
+          "monitoring-monitoring-kube-prometheus-kubernetes-system-scheduler-e4047fa9-a162-43ba-90e8-3101807f038b.yaml",
+          "monitoring-monitoring-kube-prometheus-node-exporter-f0d44fb1-e58c-4ddf-a02b-3ca1cd5546bb.yaml",
+          "monitoring-monitoring-kube-prometheus-node-exporter.rules-6bb3db2e-8dac-447c-9c2a-6ecca523cae8.yaml",
+          "monitoring-monitoring-kube-prometheus-node-network-6168a18f-9501-4510-bca8-7a5242a800d2.yaml",
+          "monitoring-monitoring-kube-prometheus-node.rules-760c5874-006f-4033-9850-74b37d1680d4.yaml",
+          "monitoring-monitoring-kube-prometheus-prometheus-bd6730a9-774d-41f6-8b33-a322e81593ed.yaml",
+          "monitoring-monitoring-kube-prometheus-prometheus-operator-cfb21edc-e842-497a-b137-b00386c2eb88.yaml"
+        ]
+      }
+    ],
+    "secrets": []
+  },
+  "warnings": [
+    "secrets: omitted intentionally; Secret objects are not fetched (references remain available)"
+  ],
+  "service_pod_mappings": [
+    {
+      "service": "alertmanager-operated",
+      "matched_pods": [
+        "alertmanager-monitoring-kube-prometheus-alertmanager-0"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "cluster-alloy",
+      "matched_pods": [
+        "cluster-alloy-79588f4cd5-wr8wx"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "cluster-alloy-cluster",
+      "matched_pods": [
+        "cluster-alloy-79588f4cd5-wr8wx"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "monitoring-grafana",
+      "matched_pods": [
+        "monitoring-grafana-758b69f4fd-7kg8r"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "monitoring-kube-prometheus-alertmanager",
+      "matched_pods": [
+        "alertmanager-monitoring-kube-prometheus-alertmanager-0"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "monitoring-kube-prometheus-operator",
+      "matched_pods": [
+        "monitoring-kube-prometheus-operator-5949d5dfdf-c46jf"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "monitoring-kube-prometheus-prometheus",
+      "matched_pods": [
+        "prometheus-monitoring-kube-prometheus-prometheus-0"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "monitoring-kube-state-metrics",
+      "matched_pods": [
+        "monitoring-kube-state-metrics-567d85f95f-lq68c"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "monitoring-prometheus-node-exporter",
+      "matched_pods": [
+        "monitoring-prometheus-node-exporter-2m8tj"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "node-alloy",
+      "matched_pods": [
+        "node-alloy-9d4wt"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    },
+    {
+      "service": "prometheus-operated",
+      "matched_pods": [
+        "prometheus-monitoring-kube-prometheus-prometheus-0"
+      ],
+      "evidence": "SERVICE_SELECTOR_MATCH",
+      "note": "Label match only; EndpointSlice and traffic health not verified"
+    }
+  ],
+  "dependency_target_summary": {
+    "TARGET_EXISTS": 17,
+    "TARGET_NOT_FOUND": 4,
+    "NOT_VERIFIED": 28
+  },
+  "verification_scope": "NAMESPACE_RESOURCE_INVENTORY_DECLARED_DEPENDENCIES_AND_NAME_EXISTENCE",
+  "source_manifest_provenance_verified": false,
+  "collection_status": {
+    "deployments": "SUCCESS",
+    "statefulsets": "SUCCESS",
+    "daemonsets": "SUCCESS",
+    "services": "SUCCESS",
+    "pods": "SUCCESS",
+    "hpas": "SUCCESS",
+    "pvcs": "SUCCESS",
+    "serviceaccounts": "SUCCESS",
+    "configmaps": "SUCCESS"
+  }
+}

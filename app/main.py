@@ -1,13 +1,12 @@
-
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from fastapi.responses import StreamingResponse
 
 from app.repository import analyze_repository
 from app.excel_generator import generate_excel
 from app.dependency_correlator import correlate_dependencies
 from app.migration_impact_analyzer import analyze_migration_impact
-
+from app.runtime_cluster_analyzer import collect_runtime_snapshot
 from app.application_dependency_analyzer import (
     correlate_application_dependencies,
     correlate_application_configuration,
@@ -20,6 +19,20 @@ app = FastAPI(title="AI Code Analyzer")
 class AnalyzeRequest(BaseModel):
     repo_url: str
     branch: str | None = None
+    include_runtime: bool = False
+    runtime_context: str | None = None
+    runtime_namespace: str | None = None
+    runtime_kubeconfig: str | None = None
+
+    @model_validator(mode="after")
+    def validate_runtime_options(self):
+        if self.include_runtime:
+            if not self.runtime_context or not self.runtime_context.strip():
+                raise ValueError("runtime_context is required when include_runtime=true")
+            if (not self.runtime_namespace or not self.runtime_namespace.strip()
+                    or self.runtime_namespace.strip() == "*"):
+                raise ValueError("An explicit runtime_namespace is required when include_runtime=true")
+        return self
 
 
 @app.get("/health")
@@ -27,96 +40,90 @@ def health():
     return {"status": "UP"}
 
 
-# -------------------------------------------------
-# COMMON ASSESSMENT PIPELINE
-# Used by JSON and Excel endpoints
-# -------------------------------------------------
-
-def run_full_assessment(repo_url: str, branch: str | None = None):
-
-    # Step 1: Repository discovery
-    result = analyze_repository(
-        repo_url=repo_url,
-        branch=branch,
-    )
-
+def run_full_assessment(
+    repo_url: str,
+    branch: str | None = None,
+    *,
+    include_runtime: bool = False,
+    runtime_context: str | None = None,
+    runtime_namespace: str | None = None,
+    runtime_kubeconfig: str | None = None,
+):
+    # Existing source assessment pipeline remains unchanged.
+    result = analyze_repository(repo_url=repo_url, branch=branch)
     deployment_details = result.get("deployment_details", [])
 
-    # Step 2: Kubernetes dependency correlation
-    correlation = correlate_dependencies(deployment_details)
-    result.update(correlation)
-
-    # Step 3: Application-to-database dependencies
-    result["application_dependencies"] = (
-        correlate_application_dependencies(
-            result.get("database_details", []),
-            deployment_details,
-        )
+    result.update(correlate_dependencies(deployment_details))
+    result["application_dependencies"] = correlate_application_dependencies(
+        result.get("database_details", []), deployment_details
     )
-
-    # Step 4: ConfigMap and Secret dependencies
     result["application_configuration_dependencies"] = (
-        correlate_application_configuration(
-            deployment_details
-        )
+        correlate_application_configuration(deployment_details)
     )
-
-    # Step 5: End-to-end dependency chains
-    result["end_to_end_dependencies"] = (
-        correlate_end_to_end_dependencies(
-            result.get("database_details", []),
-            deployment_details,
-        )
+    result["end_to_end_dependencies"] = correlate_end_to_end_dependencies(
+        result.get("database_details", []), deployment_details
     )
+    result.update(analyze_migration_impact(result))
 
-    # Step 6: Migration impact and risk assessment
-    migration_impact = analyze_migration_impact(result)
-    result.update(migration_impact)
+    # Runtime evidence is independent of the source analysis.
+    # No source-to-runtime provenance is asserted.
+    if include_runtime:
+        if not runtime_context or not runtime_namespace or runtime_namespace == "*":
+            raise ValueError("Explicit runtime_context and runtime_namespace are required")
+        try:
+            snapshot = collect_runtime_snapshot(
+                context=runtime_context,
+                namespace=runtime_namespace,
+                kubeconfig=runtime_kubeconfig,
+            )
+        except ValueError:
+            raise
+        except Exception as exc:
+            # Do not return kubeconfig paths or API details to the HTTP client.
+            raise RuntimeError("Runtime collection failed; check server logs") from exc
 
+        result["runtime_assessment"] = snapshot
+        result["runtime_assessment_note"] = (
+            "Independent namespace runtime inventory. Not proof that the assessed "
+            "repository produced these resources. No source-to-runtime correlation performed."
+        )
     return result
 
 
-# -------------------------------------------------
-# JSON ASSESSMENT
-# -------------------------------------------------
+def _assess(request: AnalyzeRequest):
+    return run_full_assessment(
+        repo_url=request.repo_url,
+        branch=request.branch,
+        include_runtime=request.include_runtime,
+        runtime_context=request.runtime_context,
+        runtime_namespace=request.runtime_namespace,
+        runtime_kubeconfig=request.runtime_kubeconfig,
+    )
+
 
 @app.post("/analyze")
 def analyze(request: AnalyzeRequest):
     try:
-        return run_full_assessment(
-            repo_url=request.repo_url,
-            branch=request.branch,
-        )
-
+        return _assess(request)
     except ValueError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail=str(exc),
-        )
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        import traceback
+        traceback.print_exc()
 
-    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Repository analysis failed. Check server logs.",
-        )
+        ) from exc
 
-
-# -------------------------------------------------
-# EXCEL ASSESSMENT
-# -------------------------------------------------
 
 @app.post("/analyze/excel")
 def analyze_excel(request: AnalyzeRequest):
     try:
-        # Same complete assessment as /analyze
-        analysis = run_full_assessment(
-            repo_url=request.repo_url,
-            branch=request.branch,
-        )
-
-        # Generate Excel with all assessment results
+        analysis = _assess(request)
         excel_file = generate_excel(analysis)
-
         return StreamingResponse(
             excel_file,
             media_type=(
@@ -124,19 +131,15 @@ def analyze_excel(request: AnalyzeRequest):
                 "spreadsheetml.sheet"
             ),
             headers={
-                "Content-Disposition":
-                'attachment; filename="migration-assessment.xlsx"'
+                "Content-Disposition": 'attachment; filename="migration-assessment.xlsx"'
             },
         )
-
     except ValueError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail=str(exc),
-        )
-
-    except Exception:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
         raise HTTPException(
             status_code=500,
             detail="Excel generation failed. Check server logs.",
-        )
+        ) from exc
