@@ -23,7 +23,7 @@ def _resource_label(resource):
 
 
 def _names(items):
-    return ", ".join(str(item.get("name")) for item in items if item.get("name"))
+    return ", ".join(sorted({str(item.get("name")) for item in items if item.get("name")}))
 
 
 def _files(items):
@@ -350,8 +350,12 @@ def add_assessment_report_sheets(wb, result):
         ["High Findings", summary.get("high", 0)],
         ["Medium Findings", summary.get("medium", 0)],
         ["Low Findings", summary.get("low", 0)],
+        ["Source Client Calls Detected", result.get("source_client_evidence_count", 0)],
+        ["Source Client Validation", "Static call candidates only; effective target and runtime connectivity not verified."],
+        ["Runtime Inventory Collected", bool((result.get("runtime_assessment") or {}).get("runtime_verified", False))],
+        ["Runtime Workload Scope", (result.get("runtime_assessment") or {}).get("application_scope", {}).get("requested_workload") or "Not specified"],
         ["Runtime Verified", False],
-        ["Analysis Scope", "Static repository and Kubernetes manifest analysis"],
+        ["Analysis Scope", "Static repository and Kubernetes manifest analysis; optional read-only runtime inventory"],
         ["Important Limitation", "Candidate dependencies are not confirmed runtime topology."],
         ["Deployment Validation", "Confirm active Helm/Kustomize overlays and namespaces."],
         ["Connectivity Validation", "Validate DNS, TCP, TLS and authentication in AKS."],

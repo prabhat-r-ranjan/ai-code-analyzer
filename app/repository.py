@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urlparse
@@ -11,13 +10,13 @@ from app.integration_analyzer import analyze_integrations
 from app.downstream_analyzer import analyze_downstream
 from app.deployment_analyzer import analyze_deployments
 from app.deployment_selector import analyze_deployment_selection
+from app.source_client_analyzer import analyze_source_clients
+
 
 def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
     parsed = urlparse(repo_url)
-
     if parsed.scheme != "https" or not parsed.hostname:
         raise ValueError("A valid HTTPS repository URL is required")
-
     if parsed.username or parsed.password:
         raise ValueError("Do not include credentials in repository URLs")
 
@@ -28,45 +27,33 @@ def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
             "depth": 1,
             "multi_options": ["--no-tags"],
         }
-
         if branch:
             clone_options["branch"] = branch
-
         Repo.clone_from(**clone_options)
-
         root = Path(temp_dir)
-
-        pom_files = [
+        pom_files = sorted(
             str(path.relative_to(root))
             for path in root.rglob("pom.xml")
             if ".git" not in path.parts
-        ]
+        )
         technologies = []
         for pom_file in pom_files:
-            pom_path = root / pom_file
-
-            result = analyze_technologies(pom_path)
+            result = analyze_technologies(root / pom_file)
             result["pom_file"] = pom_file
             result["classified_technology"] = classify_technologies(result)
-            technologies.append({
-                "pom_file": pom_file,
-                **result
-            })
+            technologies.append({"pom_file": pom_file, **result})
+
         api_endpoints = analyze_apis(root)
         database_details = analyze_databases(root)
         integration_details = analyze_integrations(root)
         downstream_details = analyze_downstream(root)
+        source_client_evidence = analyze_source_clients(root)
         deployment_details = analyze_deployments(root)
-
-        selection_result = analyze_deployment_selection(
-            root,
-            deployment_details
-        )
-
+        selection_result = analyze_deployment_selection(root, deployment_details)
         return {
             "repository": repo_url,
             "branch": branch or "default",
-            "pom_files": sorted(pom_files),
+            "pom_files": pom_files,
             "pom_count": len(pom_files),
             "status": "completed",
             "technologies": technologies,
@@ -78,6 +65,8 @@ def analyze_repository(repo_url: str, branch: str | None = None) -> dict:
             "integration_count": len(integration_details),
             "downstream_details": downstream_details,
             "downstream_count": len(downstream_details),
+            "source_client_evidence": source_client_evidence,
+            "source_client_evidence_count": len(source_client_evidence),
             "deployment_details": deployment_details,
             "deployment_count": len(deployment_details),
             **selection_result,
