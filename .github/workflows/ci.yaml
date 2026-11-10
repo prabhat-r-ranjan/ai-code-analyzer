@@ -1,0 +1,11 @@
+name: AI Code Analyzer containerPort
+
+on:
+  push:
+    branches:
+      - feature/migration-assessment
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Workflow started"
