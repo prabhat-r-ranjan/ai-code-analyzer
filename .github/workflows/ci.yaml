@@ -8,4 +8,9 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Workflow started"
+      #- run: echo "Workflow started"
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      
+      - name: Build Docker image
+        run: docker build -t ai-code-analyzer:ci .
